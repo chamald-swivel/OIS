@@ -1,0 +1,13 @@
+/* MOLECULE: SSOButtonGroup Styles */
+
+.sso-button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.sso-button-group__icon {
+  width: 20px;
+  height: 20px;
+}

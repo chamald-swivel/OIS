@@ -1,0 +1,23 @@
+azure-functions
+python-docx
+openai
+azure-identity
+python-magic
+pymupdf
+python-multipart
+
+# Azure Functions Core
+azure-functions>=1.18.0
+
+# Document Processing
+python-docx>=0.8.11        # DOCX creation and manipulation
+PyMuPDF>=1.23.8            # PDF processing (fitz)
+
+# Security - File Type Validation
+python-magic>=0.4.27       # MIME type detection by content
+
+# Azure OpenAI
+openai>=1.0.0              # Azure OpenAI SDK
+
+# Optional but recommended
+python-magic-bin>=0.4.14   # Windows binary for python-magic (Windows only)

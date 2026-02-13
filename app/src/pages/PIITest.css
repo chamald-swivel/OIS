@@ -1,0 +1,186 @@
+.pii-test-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.pii-test-header {
+  margin-bottom: 2rem;
+}
+
+.pii-test-header h1 {
+  margin-bottom: 0.5rem;
+}
+
+.pii-test-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.pii-test-input-section,
+.pii-test-output-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pii-test-textarea {
+  width: 100%;
+  min-height: 300px;
+  padding: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 14px;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.pii-test-textarea:focus {
+  outline: none;
+  border-color: #0078d4;
+  box-shadow: 0 0 0 1px #0078d4;
+}
+
+.pii-test-textarea:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+
+.pii-test-output-box {
+  background-color: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  padding: 1rem;
+  min-height: 300px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.pii-test-empty-state {
+  color: #6b7280;
+  font-style: italic;
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.pii-test-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.pii-test-entities {
+  margin-top: 1.5rem;
+}
+
+.pii-test-entities-grid {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.pii-entity-item {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 0.75rem;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 1rem;
+  align-items: center;
+}
+
+.pii-entity-text {
+  font-weight: 600;
+  color: #111827;
+  word-break: break-word;
+}
+
+.pii-entity-category {
+  background-color: #dbeafe;
+  color: #1e40af;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.pii-entity-confidence {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.pii-test-stats {
+  display: flex;
+  gap: 2rem;
+  padding: 1rem;
+  background-color: #f0f9ff;
+  border-radius: 4px;
+  border: 1px solid #bae6fd;
+}
+
+.pii-test-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.pii-test-stat-label {
+  color: #6b7280;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pii-test-stat-value {
+  color: #0c4a6e;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.pii-test-example {
+  background-color: #fef3c7;
+  border: 1px solid #fcd34d;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.pii-test-example-title {
+  font-weight: 600;
+  color: #92400e;
+  margin-bottom: 0.5rem;
+}
+
+.pii-test-example-text {
+  color: #78350f;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .pii-test-content {
+    grid-template-columns: 1fr;
+  }
+
+  .pii-test-actions {
+    flex-direction: column;
+  }
+
+  .pii-entity-item {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .pii-test-stats {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}

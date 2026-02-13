@@ -1,0 +1,18 @@
+/* MOLECULE: UserCard Styles */
+
+.user-card {
+  width: 100%;
+}
+
+.user-card__content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}

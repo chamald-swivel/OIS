@@ -1,0 +1,25 @@
+/* MOLECULE: ErrorMessage Styles */
+
+.error-message {
+  background: #fef6f6;
+  border-color: #d13438;
+  width: 100%;
+}
+
+.error-message__content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.error-message__icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.error-message__text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}

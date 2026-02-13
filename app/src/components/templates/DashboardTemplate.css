@@ -1,0 +1,54 @@
+/* TEMPLATE: DashboardTemplate Styles */
+
+.dashboard-template {
+  min-height: 100vh;
+  background: #faf9f8;
+}
+
+.dashboard-template__header {
+  background: white;
+  border-bottom: 1px solid #edebe9;
+  padding: 20px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-template__header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.dashboard-template__user-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.dashboard-template__main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.dashboard-template__content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+@media (max-width: 768px) {
+  .dashboard-template__header-content {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dashboard-template__user-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

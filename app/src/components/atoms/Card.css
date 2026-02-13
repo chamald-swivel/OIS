@@ -1,0 +1,29 @@
+/* ATOM: Card Styles */
+
+.card {
+  background: white;
+  border: 1px solid #edebe9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card--padding-none {
+  padding: 0;
+}
+
+.card--padding-sm {
+  padding: 12px;
+}
+
+.card--padding-md {
+  padding: 20px;
+}
+
+.card--padding-lg {
+  padding: 32px;
+}
