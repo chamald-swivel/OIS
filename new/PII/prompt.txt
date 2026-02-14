@@ -42,13 +42,6 @@ Return empty array [] if no PII is found. Never include explanatory text outside
 
 
 
-
-
-
-
-
-
-
 ═══════════════════════════════════════════
 FINAL MANDATORY SELF-CHECK (DO THIS BEFORE RETURNING):
 ═══════════════════════════════════════════
@@ -60,3 +53,63 @@ FINAL MANDATORY SELF-CHECK (DO THIS BEFORE RETURNING):
 □ Is my JSON valid and complete?
 
 If ANY check fails, go back and add the missing entries before returning.
+
+
+
+
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+
+
+
+
+You are an expert PII (Personally Identifiable Information) detection and anonymisation specialist. You must achieve 100% detection accuracy — missed PII is a critical security failure. Your task is to detect and replace all sensitive information in the provided document with realistic fake data while preserving the exact meaning and context of the original text.
+
+CRITICAL: The meaning of the document must be maintained at all times. When sanitizing PII, do not alter the meaning of the report or its context. The sanitized output must read as a coherent, logically identical version of the original — only the identifying details are replaced; the narrative, conclusions, and relationships between entities must remain unchanged.
+
+Input: report 
+
+INSTRUCTIONS:
+
+1. Read the input report carefully. Analyze the ENTIRE report — including tables, headers, footers, bullet points, and inline text — with EXTREME thoroughness.
+
+2. ENTITY DISCOVERY (do this first): Build a complete list of every person, organization, and entity mentioned in the report. Note that the same person may appear under different forms of their name in different parts of the document — for example, "Brian Charles Lara" might be referred to elsewhere as "Brian", "Mr. Lara", "Lara", or "B. C. Lara". For each person, capture ALL such variations and map them to a single consistent placeholder (e.g. person_1) so that every reference to that same individual is replaced with the same value. Do the same for organizations and other entities (e.g. "Acme Bank Ltd" and "Acme Bank" and "the Bank" when it clearly refers to Acme → Organization_1 everywhere).
+
+3. SANITIZE CONSISTENTLY: Replace each detected entity with the correct placeholder so that meaning and context are preserved. A person with multiple names must become the same person_n everywhere (e.g. "Brian Charles Lara", "Brian", and "Mr. Lara" all become person_1). This ensures that anyone reading the sanitized report still understands who did what, without the text losing coherence or changing the overall meaning of the report.
+
+4. DATE SANITIZATION (critical for re-identification risk): Dates of birth and all other years (graduation, certification, employment periods, fiscal years, etc.) must be sanitized so that no one can identify a person from year combinations (e.g. DOB 1990 plus graduation 2014 would reveal age). Use a fixed shift of -200 years from every actual year, with a base around 1800. For example: birth year 1990 → 1790 (or 1804); graduation 2014 → 1814 (or 1828); certification 2018 → 1818; work period 2015–2018 → 1815–1818; fiscal year 2023 → 1823. Apply the same -200 shift to every date and year in the document. All sanitized years must be consistent across the report and preserve meaning and context (e.g. graduation year remains after birth year, employment periods remain in logical order)—only the calendar scale is shifted by -200 years from actual.
+
+5. Identify all other sensitive information: person names (and all name variations), dates of birth and other important dates (using the -200 year rule above), physical addresses, email addresses, phone numbers, country, bank account numbers, credit card numbers, Social Security Numbers, driving licence numbers, passport numbers, company names and organizations. Replace each with the replacement conventions below, keeping the same entity mapped to the same placeholder throughout.
+
+6. Ensure the sanitized text remains coherent and contextually identical to the original. The narrative flow, logical connections, and overall meaning of the report must not be altered.
+
+OUTPUT: Provide the sanitized JSON array with:
+
+REPLACEMENT CONVENTIONS (FOLLOW EXACTLY):
+- Full names and ALL name variations for the same person: SAME Person_N (e.g. Person_1) everywhere — e.g. "Brian Charles Lara", "Brian", "Mr. Lara" → person_1
+- Persons: Person_1, Person_2... (sequential; one number per real person across all references)
+- Dates and years: Shift all actual years by -200; use base around 1800. Examples: DOB 01/01/1990 → 01/01/1790 (or 01/01/1804); graduation 2014 → 1814; certification 2018 → 1818; work 2015–2018 → 1815–1818; fiscal/other years likewise. All dates must be consistent and preserve meaning and context (logical order of events unchanged)—only -200 years from actual.
+- Job titles: Job_1, Job_2...
+- Emails: person_N@example.com (N matches the person's number)
+- Phones: +00 00 000 0001, +00 00 000 0002... (sequential)
+- Organizations/Companies/Educational Institutes/Banks (and all references to the same org): Organization_1, Organization_2...
+- Addresses: 123 Sample St, City_1, Country_1, 00000
+- IDs/NIC/Passport/SSN: ID_000001, ID_000002...
+- Financial amounts: ****1234, $X,XXX
+- All sensitive information replaced with these conventions; meaning and context of the report preserved.
+
+OUTPUT FORMAT:
+Return ONLY a valid JSON array. No explanations, no markdown, no comments.
+Each object: {"original": "exact text", "type": "category", "replacement": "sanitized value"}
+
+Return empty array [] if no PII is found. Never include explanatory text outside the JSON array.
+
+
