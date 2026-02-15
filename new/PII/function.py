@@ -8,6 +8,7 @@ from typing import Any, Final
 import fitz  # PyMuPDF
 from docx import Document
 from docx.oxml.ns import qn
+from PIL import Image, ImageDraw
 
 
 def extract_text_from_pdf_bytes(pdf_bytes: bytes) -> str:
@@ -139,6 +140,48 @@ def sanitize_pdf_bytes(pdf_bytes: bytes, replacements: list[dict[str, Any]]) -> 
                     page.apply_redactions(images=fitz.PDF_REDACT_IMAGE_NONE)
                 except Exception as e:
                     logging.warning(f"apply_redactions failed: {e}")
+
+    # --- Replace images with dummy placeholders ---
+    for page in doc:
+        images = page.get_images(full=True)
+        if not images:
+            continue
+        seen_xrefs: set[int] = set()
+        image_rects: list = []
+        for img_info in images:
+            xref = img_info[0]
+            if xref in seen_xrefs:
+                continue
+            seen_xrefs.add(xref)
+            try:
+                rects = page.get_image_rects(xref)
+                for rect in rects:
+                    if rect.is_empty or rect.is_infinite:
+                        continue
+                    image_rects.append(rect)
+                    page.add_redact_annot(rect, text="", fill=(0.93, 0.93, 0.93))
+            except Exception as e:
+                logging.warning(f"Could not get rects for image xref {xref}: {e}")
+        if image_rects:
+            try:
+                page.apply_redactions(images=fitz.PDF_REDACT_IMAGE_REMOVE)
+            except Exception as e:
+                logging.warning(f"Image redaction failed: {e}")
+                continue
+            for rect in image_rects:
+                page.draw_rect(rect, color=(0.75, 0.75, 0.75), width=0.5)
+                label = "[IMAGE REMOVED]"
+                fs = max(min(rect.width / 12, rect.height / 2, 12), 4)
+                try:
+                    tw = fitz.get_text_length(label, fontname="helv", fontsize=fs)
+                    cx = rect.x0 + (rect.width - tw) / 2
+                    cy = rect.y0 + (rect.height + fs) / 2
+                    page.insert_text(
+                        fitz.Point(cx, cy), label,
+                        fontname="helv", fontsize=fs, color=(0.5, 0.5, 0.5),
+                    )
+                except Exception as e:
+                    logging.warning(f"Could not insert placeholder text: {e}")
 
     out = BytesIO()
     doc.save(out, deflate=True)
@@ -317,6 +360,70 @@ def _apply_replacements_to_paragraph(para, sorted_replacements: list[dict[str, A
     return count
 
 
+def _create_placeholder_image(width: int, height: int) -> bytes:
+    """Create a gray placeholder PNG image with '[IMAGE REMOVED]' text."""
+    width = max(width, 1)
+    height = max(height, 1)
+
+    img = Image.new("RGB", (width, height), color=(235, 235, 235))
+    draw = ImageDraw.Draw(img)
+
+    if width > 4 and height > 4:
+        draw.rectangle([1, 1, width - 2, height - 2], outline=(180, 180, 180), width=2)
+
+    text = "[IMAGE REMOVED]"
+    try:
+        bbox = draw.textbbox((0, 0), text)
+        tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
+        if tw < width - 4 and th < height - 4:
+            x = (width - tw) / 2
+            y = (height - th) / 2
+            draw.text((x, y), text, fill=(128, 128, 128))
+    except Exception:
+        pass
+
+    buf = BytesIO()
+    img.save(buf, format="PNG")
+    return buf.getvalue()
+
+
+def _replace_images_in_docx(doc: Document) -> None:
+    """Replace all embedded images in a DOCX with gray placeholders of the same size."""
+    seen_part_ids: set[int] = set()
+
+    def _scan_and_replace(part):
+        for rel in part.rels.values():
+            if "image" not in rel.reltype.lower():
+                continue
+            try:
+                image_part = rel.target_part
+                pid = id(image_part)
+                if pid in seen_part_ids:
+                    continue
+                seen_part_ids.add(pid)
+                try:
+                    pil_img = Image.open(BytesIO(image_part.blob))
+                    w, h = pil_img.size
+                    pil_img.close()
+                except Exception:
+                    w, h = 200, 200  # fallback for unsupported formats (WMF/EMF)
+                image_part._blob = _create_placeholder_image(w, h)
+                image_part._content_type = "image/png"
+            except Exception as e:
+                logging.warning(f"Could not replace DOCX image: {e}")
+
+    _scan_and_replace(doc.part)
+    for section in doc.sections:
+        try:
+            _scan_and_replace(section.header.part)
+        except Exception:
+            pass
+        try:
+            _scan_and_replace(section.footer.part)
+        except Exception:
+            pass
+
+
 def sanitize_docx_bytes(docx_bytes: bytes, replacements: list[dict[str, Any]]) -> bytes:
     """
     Replace PII in a DOCX with sanitized values. Processes body paragraphs,
@@ -366,6 +473,9 @@ def sanitize_docx_bytes(docx_bytes: bytes, replacements: list[dict[str, Any]]) -
             process_para(para)
         for para in section.footer.paragraphs:
             process_para(para)
+
+    # Replace all embedded images with dummy placeholders
+    _replace_images_in_docx(doc)
 
     out = BytesIO()
     doc.save(out)
